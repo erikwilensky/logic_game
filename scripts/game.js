@@ -9,6 +9,11 @@ class LogicGame {
         this.isAnswered = false;
         this.truthTableBuilder = null;
         this.kmapBuilder = null;
+        this.timer = null;
+        this.timeRemaining = 0;
+        this.modeStartTime = null;
+        this.currentSectionTotal = 0;
+        this.currentSectionCompleted = 0;
 
         this.initializeElements();
         this.attachEventListeners();
@@ -42,7 +47,10 @@ class LogicGame {
             score: document.getElementById('score'),
             progress: document.getElementById('progress'),
             accuracy: document.getElementById('accuracy'),
-            categoryList: document.getElementById('categoryList')
+            categoryList: document.getElementById('categoryList'),
+            timerDisplay: document.getElementById('timerDisplay'),
+            timerContainer: document.getElementById('timerContainer'),
+            backBtn: document.getElementById('backBtn')
         };
     }
 
@@ -58,6 +66,9 @@ class LogicGame {
         this.elements.checkBtn.addEventListener('click', () => this.checkAnswer());
         this.elements.nextBtn.addEventListener('click', () => this.nextQuestion());
         this.elements.showSolutionBtn.addEventListener('click', () => this.showSolution());
+        if (this.elements.backBtn) {
+            this.elements.backBtn.addEventListener('click', () => this.showQuestionSelector());
+        }
     }
 
     showModeSelector() {
@@ -67,6 +78,15 @@ class LogicGame {
     }
 
     showQuestionSelector() {
+        // Stop timer if running
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+        if (this.elements.timerContainer) {
+            this.elements.timerContainer.style.display = 'none';
+        }
+        
         this.elements.modeSelector.style.display = 'none';
         this.elements.gameArea.style.display = 'none';
         this.elements.questionSelector.style.display = 'block';
@@ -92,7 +112,67 @@ class LogicGame {
         this.currentSection = sectionKey;
         this.questions = [...QUESTION_BANK[sectionKey].questions];
         this.currentQuestionIndex = 0;
+        this.currentSectionTotal = this.questions.length;
+        this.currentSectionCompleted = 0;
+        
+        // Reset mode-specific scoring if switching modes
+        if (this.gameMode === 'timed' || this.gameMode === 'exam') {
+            this.startTimer();
+        }
+        
         this.loadQuestion(this.questions[0]);
+    }
+    
+    startTimer() {
+        if (this.timer) {
+            clearInterval(this.timer);
+        }
+        
+        if (this.gameMode === 'timed') {
+            this.timeRemaining = 30 * 60; // 30 minutes
+        } else if (this.gameMode === 'exam') {
+            this.timeRemaining = 60 * 60; // 60 minutes
+        } else {
+            // Practice mode - no timer
+            if (this.elements.timerContainer) {
+                this.elements.timerContainer.style.display = 'none';
+            }
+            return;
+        }
+        
+        if (this.elements.timerContainer) {
+            this.elements.timerContainer.style.display = 'flex';
+        }
+        
+        this.updateTimerDisplay();
+        this.timer = setInterval(() => {
+            this.timeRemaining--;
+            this.updateTimerDisplay();
+            if (this.timeRemaining <= 0) {
+                this.timeUp();
+            }
+        }, 1000);
+    }
+    
+    updateTimerDisplay() {
+        if (!this.elements.timerDisplay) return;
+        const minutes = Math.floor(this.timeRemaining / 60);
+        const seconds = this.timeRemaining % 60;
+        this.elements.timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        if (this.timeRemaining < 300) { // Less than 5 minutes
+            this.elements.timerDisplay.style.color = 'var(--error-color)';
+        } else {
+            this.elements.timerDisplay.style.color = '';
+        }
+    }
+    
+    timeUp() {
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+        alert('Time is up! Your progress has been saved.');
+        this.showQuestionSelector();
     }
 
     loadQuestion(question) {
@@ -106,7 +186,7 @@ class LogicGame {
 
         this.elements.questionTitle.textContent = question.question;
         this.elements.questionNumber.textContent = this.currentQuestionIndex + 1;
-        this.elements.totalQuestions.textContent = this.questions.length;
+        this.elements.totalQuestions.textContent = this.currentSectionTotal;
 
         const difficultyClass = question.difficulty || 'medium';
         this.elements.difficulty.textContent = difficultyClass.charAt(0).toUpperCase() + difficultyClass.slice(1);
@@ -154,13 +234,13 @@ class LogicGame {
     getInstructions(type) {
         const instructions = {
             truth_table: 'Fill in the output column (Q) with 0 or 1 for each row.',
-            expression_and_table: 'Write the Boolean expression and fill in the truth table.',
-            kmap_from_table: 'Fill in the K-map cells based on the truth table. Click cells to toggle between 0, 1, and X.',
-            kmap_from_description: 'Fill in the K-map cells based on the description. Click cells to toggle between 0, 1, and X.',
-            kmap_from_expression: 'Build the truth table and K-map, then fill in the K-map cells.',
-            kmap_from_minterms: 'Fill in the K-map cells for the given minterms. Click cells to toggle between 0, 1, and X.',
-            kmap_simplify: 'Fill in the K-map and write the simplified expression.',
-            boss_fight: 'Complete all parts: truth table, K-map, and simplification.'
+            expression_and_table: 'Write the Boolean expression and fill in the truth table. Use operators: AND, OR, NOT, XOR.',
+            kmap_from_table: 'Fill in the K-map cells based on the truth table. Click cells to toggle: 0 → 1 → X → 0. X means don\'t-care.',
+            kmap_from_description: 'Fill in the K-map cells based on the description. Click cells to toggle: 0 → 1 → X → 0. X means don\'t-care.',
+            kmap_from_expression: 'Build the truth table and K-map, then fill in the K-map cells. Click cells to toggle: 0 → 1 → X → 0.',
+            kmap_from_minterms: 'Fill in the K-map cells for the given minterms. Click cells to toggle: 0 → 1 → X → 0. X means don\'t-care.',
+            kmap_simplify: 'Fill in the K-map and write the simplified expression. Use operators: AND, OR, NOT.',
+            boss_fight: 'Complete all parts: truth table, K-map, and simplification. Click K-map cells to toggle: 0 → 1 → X → 0.'
         };
         return instructions[type] || 'Follow the instructions above.';
     }
@@ -208,12 +288,12 @@ class LogicGame {
         this.kmapBuilder = new KarnaughMapBuilder('kmapAnswer');
         this.kmapBuilder.render(question);
 
-        if (question.type === 'kmap_simplify') {
+        if (question.type === 'kmap_simplify' || question.type === 'kmap_from_expression' || question.type === 'kmap_from_minterms') {
             const expressionDiv = document.createElement('div');
             expressionDiv.className = 'kmap-expression';
             expressionDiv.innerHTML = `
                 <label>Simplified Expression:</label>
-                <input type="text" id="kmapExpressionInput" placeholder="e.g., A OR B">
+                <input type="text" id="kmapExpressionInput" placeholder="e.g., A OR B" style="color: var(--text-color); background: white; border: 2px solid var(--border-color); padding: 12px; font-size: 1.1em; width: 100%; max-width: 500px; border-radius: 4px;">
             `;
             this.elements.answerSection.appendChild(expressionDiv);
         }
@@ -238,7 +318,7 @@ class LogicGame {
         expressionDiv.className = 'kmap-expression';
         expressionDiv.innerHTML = `
             <label>Simplified Expression:</label>
-            <input type="text" id="kmapExpressionInput" placeholder="e.g., (A AND NOT B) OR (B AND C)">
+            <input type="text" id="kmapExpressionInput" placeholder="e.g., (A AND NOT B) OR (B AND C)" style="color: var(--text-color); background: white; border: 2px solid var(--border-color); padding: 12px; font-size: 1.1em; width: 100%; max-width: 500px; border-radius: 4px;">
         `;
         this.elements.answerSection.appendChild(expressionDiv);
     }
@@ -314,30 +394,69 @@ class LogicGame {
     }
 
     normalizeExpression(expr) {
-        return expr.replace(/\s+/g, ' ').trim();
+        if (!expr) return '';
+        // Normalize whitespace
+        let normalized = expr.replace(/\s+/g, ' ').trim().toUpperCase();
+        // Handle common variations
+        normalized = normalized.replace(/\bAND\b/g, 'AND');
+        normalized = normalized.replace(/\bOR\b/g, 'OR');
+        normalized = normalized.replace(/\bNOT\b/g, 'NOT');
+        normalized = normalized.replace(/\bXOR\b/g, 'XOR');
+        // Remove extra spaces around operators
+        normalized = normalized.replace(/\s*\(\s*/g, '(');
+        normalized = normalized.replace(/\s*\)\s*/g, ')');
+        return normalized;
+    }
+    
+    expressionsEquivalent(expr1, expr2) {
+        const norm1 = this.normalizeExpression(expr1);
+        const norm2 = this.normalizeExpression(expr2);
+        
+        // Exact match
+        if (norm1 === norm2) return true;
+        
+        // Try some common equivalences
+        // (A AND B) OR (A AND C) = A AND (B OR C)
+        // But this is complex, so for now just do exact match
+        return false;
     }
 
     checkKmapAnswer() {
         if (!this.kmapBuilder) {
             return { isCorrect: false, message: 'K-map not initialized' };
         }
-        return this.kmapBuilder.checkAnswer(this.currentQuestion.answer?.kmap);
+        // Handle both 2-input and 3-input K-map formats
+        const expectedKmap = this.currentQuestion.answer?.kmap || this.currentQuestion.answer;
+        return this.kmapBuilder.checkAnswer(expectedKmap);
     }
 
     checkKmapSimplifyAnswer() {
         const kmapResult = this.checkKmapAnswer();
         const expressionInput = document.getElementById('kmapExpressionInput');
-        const userExpression = expressionInput ? expressionInput.value.trim().toUpperCase() : '';
-        const expectedExpression = (this.currentQuestion.answer?.expression || '').toUpperCase();
+        const userExpression = expressionInput ? expressionInput.value.trim() : '';
+        const expectedExpression = this.currentQuestion.answer?.expression || '';
 
         let expressionCorrect = false;
         if (userExpression && expectedExpression) {
-            expressionCorrect = this.normalizeExpression(userExpression) === this.normalizeExpression(expectedExpression);
+            const normalizedUser = this.normalizeExpression(userExpression);
+            const normalizedExpected = this.normalizeExpression(expectedExpression);
+            expressionCorrect = normalizedUser === normalizedExpected;
+            
+            // If not exact match, provide helpful feedback
+            if (!expressionCorrect && kmapResult.isCorrect) {
+                return {
+                    isCorrect: false,
+                    message: `K-map is correct, but expression doesn't match. Expected: ${expectedExpression}`,
+                    kmapCorrect: true,
+                    expressionCorrect: false
+                };
+            }
         }
 
         return {
             isCorrect: kmapResult.isCorrect && expressionCorrect,
-            message: kmapResult.isCorrect && expressionCorrect ? 'Correct!' : 'Check your K-map and expression.',
+            message: kmapResult.isCorrect && expressionCorrect ? 'Correct!' : 
+                    (!kmapResult.isCorrect ? 'Check your K-map.' : 'Check your expression.'),
             kmapCorrect: kmapResult.isCorrect,
             expressionCorrect
         };
@@ -347,8 +466,8 @@ class LogicGame {
         const tableResult = this.checkTruthTableAnswer();
         const kmapResult = this.checkKmapAnswer();
         const expressionInput = document.getElementById('kmapExpressionInput');
-        const userExpression = expressionInput ? expressionInput.value.trim().toUpperCase() : '';
-        const expectedExpression = (this.currentQuestion.answer?.simplifiedExpression || '').toUpperCase();
+        const userExpression = expressionInput ? expressionInput.value.trim() : '';
+        const expectedExpression = this.currentQuestion.answer?.simplifiedExpression || this.currentQuestion.answer?.expression || '';
 
         let expressionCorrect = false;
         if (userExpression && expectedExpression) {
@@ -356,10 +475,22 @@ class LogicGame {
         }
 
         const allCorrect = tableResult.isCorrect && kmapResult.isCorrect && expressionCorrect;
+        
+        // Provide detailed feedback
+        let message = '';
+        if (allCorrect) {
+            message = 'Perfect! All parts are correct.';
+        } else {
+            const parts = [];
+            if (!tableResult.isCorrect) parts.push('truth table');
+            if (!kmapResult.isCorrect) parts.push('K-map');
+            if (!expressionCorrect) parts.push('expression');
+            message = `Some parts are incorrect: ${parts.join(', ')}. Review your answers.`;
+        }
 
         return {
             isCorrect: allCorrect,
-            message: allCorrect ? 'Perfect! All parts are correct.' : 'Some parts are incorrect. Review your answers.',
+            message: message,
             tableCorrect: tableResult.isCorrect,
             kmapCorrect: kmapResult.isCorrect,
             expressionCorrect
@@ -370,7 +501,8 @@ class LogicGame {
         this.elements.feedbackPanel.style.display = 'block';
         this.elements.feedbackPanel.className = 'feedback-panel ' + (result.isCorrect ? 'success' : 'error');
         this.elements.feedbackTitle.textContent = result.isCorrect ? 'Correct!' : 'Incorrect';
-        this.elements.feedbackContent.innerHTML = `<p>${result.message}</p>`;
+        const message = result.message || (result.isCorrect ? 'Well done!' : 'Please try again.');
+        this.elements.feedbackContent.innerHTML = `<p>${message}</p>`;
 
         if (result.isCorrect) {
             this.elements.checkBtn.style.display = 'none';
@@ -414,13 +546,17 @@ class LogicGame {
             isCorrect,
             this.currentQuestion.difficulty || 'medium'
         );
+        if (isCorrect) {
+            this.currentSectionCompleted++;
+        }
         this.updateScoreDisplay();
     }
 
     updateScoreDisplay() {
         const progress = scoringSystem.getProgress();
         this.elements.score.textContent = progress.score;
-        this.elements.progress.textContent = `${progress.completed}/${progress.total}`;
+        // Show section progress instead of global progress
+        this.elements.progress.textContent = `${this.currentSectionCompleted}/${this.currentSectionTotal}`;
         this.elements.accuracy.textContent = `${progress.accuracy}%`;
     }
 

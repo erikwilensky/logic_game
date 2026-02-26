@@ -23,17 +23,27 @@
                     <span class="label">Accuracy:</span>
                     <span id="accuracy">0%</span>
                 </div>
+                <div class="score-item" id="timerContainer" style="display: none;">
+                    <span class="label">Time:</span>
+                    <span id="timerDisplay">0:00</span>
+                </div>
             </div>
         </header>
 
         <div class="game-mode-selector" id="modeSelector">
             <h2>Select Game Mode</h2>
             <button class="mode-btn" data-mode="practice">Practice Mode</button>
-            <button class="mode-btn" data-mode="timed">Timed Mode</button>
-            <button class="mode-btn" data-mode="exam">Exam Mode</button>
+            <button class="mode-btn" data-mode="timed">Timed Mode (30 min)</button>
+            <button class="mode-btn" data-mode="exam">Exam Mode (60 min)</button>
+            <p style="margin-top: 20px; color: #666; font-size: 0.9em;">
+                <strong>Practice Mode:</strong> No time limit, hints available<br>
+                <strong>Timed Mode:</strong> 30-minute timer, hints available<br>
+                <strong>Exam Mode:</strong> 60-minute timer, no hints
+            </p>
         </div>
 
         <div class="game-area" id="gameArea" style="display: none;">
+            <button id="backBtn" class="btn btn-secondary" style="margin-bottom: 20px;">← Back to Categories</button>
             <div class="question-section">
                 <div class="question-header">
                     <h2 id="questionTitle">Question</h2>

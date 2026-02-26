@@ -334,11 +334,29 @@ header h1 {
 .truth-table input.correct {
     background: #d4edda;
     border-color: var(--success-color);
+    position: relative;
+}
+
+.truth-table input.correct::after {
+    content: '✓';
+    position: absolute;
+    right: 5px;
+    color: var(--success-color);
+    font-weight: bold;
 }
 
 .truth-table input.incorrect {
     background: #f8d7da;
     border-color: var(--error-color);
+    position: relative;
+}
+
+.truth-table input.incorrect::after {
+    content: '✗';
+    position: absolute;
+    right: 5px;
+    color: var(--error-color);
+    font-weight: bold;
 }
 
 /* K-Map Styles */
@@ -396,6 +414,16 @@ header h1 {
     border-color: var(--primary-color);
 }
 
+.kmap-cell.correct {
+    border: 3px solid var(--success-color);
+    box-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+}
+
+.kmap-cell.incorrect {
+    border: 3px solid var(--error-color);
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+}
+
 .kmap-labels {
     display: flex;
     margin-bottom: 10px;
@@ -446,6 +474,9 @@ header h1 {
     border: 2px solid var(--border-color);
     border-radius: 4px;
     font-family: 'Courier New', monospace;
+    color: var(--text-color) !important;
+    background: white !important;
+    -webkit-text-fill-color: var(--text-color) !important;
 }
 
 .kmap-expression input:focus {
@@ -467,6 +498,9 @@ header h1 {
     border: 2px solid var(--border-color);
     border-radius: 4px;
     font-family: 'Courier New', monospace;
+    color: var(--text-color) !important;
+    background: white !important;
+    -webkit-text-fill-color: var(--text-color) !important;
 }
 
 .expression-input input:focus {

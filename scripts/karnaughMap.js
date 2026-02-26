@@ -235,24 +235,55 @@ class KarnaughMapBuilder {
     }
 
     checkAnswer(expectedKmap) {
-        if (!expectedKmap || !expectedKmap.values) {
+        if (!expectedKmap) {
             return { isCorrect: false, message: 'No expected answer provided' };
         }
 
-        const expected = expectedKmap.values;
+        let expected;
+        if (expectedKmap.values) {
+            // 3-input K-map format
+            expected = expectedKmap.values;
+        } else if (Array.isArray(expectedKmap) && Array.isArray(expectedKmap[0])) {
+            // 2-input K-map format (nested array)
+            expected = expectedKmap;
+        } else {
+            return { isCorrect: false, message: 'Invalid expected answer format' };
+        }
+
         const actual = this.kmapData;
 
+        if (!expected || !actual) {
+            return { isCorrect: false, message: 'Missing data for comparison' };
+        }
+
         if (expected.length !== actual.length) {
-            return { isCorrect: false, message: 'Row count mismatch' };
+            return { isCorrect: false, message: `Row count mismatch: expected ${expected.length}, got ${actual.length}` };
         }
 
         for (let i = 0; i < expected.length; i++) {
+            if (!Array.isArray(expected[i]) || !Array.isArray(actual[i])) {
+                continue;
+            }
             if (expected[i].length !== actual[i].length) {
-                return { isCorrect: false, message: 'Column count mismatch' };
+                return { isCorrect: false, message: `Column count mismatch at row ${i}: expected ${expected[i].length}, got ${actual[i].length}` };
             }
             for (let j = 0; j < expected[i].length; j++) {
-                if (expected[i][j] !== actual[i][j]) {
-                    return { isCorrect: false, message: `Mismatch at row ${i}, col ${j}` };
+                const expectedVal = expected[i][j];
+                const actualVal = actual[i][j];
+                // Handle null/undefined as 0 for comparison, but also handle 'X' as don't-care
+                const exp = expectedVal === null || expectedVal === undefined ? 0 : expectedVal;
+                const act = actualVal === null || actualVal === undefined ? 0 : actualVal;
+                
+                // Don't-care (X) matches anything
+                if (exp === 'X' || exp === 'x') {
+                    continue;
+                }
+                if (act === 'X' || act === 'x') {
+                    continue;
+                }
+                
+                if (exp !== act) {
+                    return { isCorrect: false, message: `Mismatch at row ${i}, col ${j}. Expected ${exp}, got ${act}` };
                 }
             }
         }
