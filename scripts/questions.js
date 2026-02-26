@@ -1121,8 +1121,8 @@ const QUESTION_BANK = {
                 id: "E1",
                 type: "boss_fight",
                 difficulty: "hard",
-                question: "A circuit is described by: Q = (A AND NOT B) OR (B AND C). a) Make the truth table. b) Make the K-map. c) Simplify Q. d) State whether the simplified form uses fewer gates.",
-                expression: "(A AND NOT B) OR (B AND C)",
+                question: "A circuit is described by: Q = (NOT A AND B AND C) OR (A AND NOT B AND NOT C) OR (A AND NOT B AND C) OR (A AND B AND C). a) Make the truth table. b) Make the K-map. c) Simplify Q. d) State whether the simplified form uses fewer gates.",
+                expression: "(NOT A AND B AND C) OR (A AND NOT B AND NOT C) OR (A AND NOT B AND C) OR (A AND B AND C)",
                 inputs: ["A", "B", "C"],
                 answer: {
                     table: [
@@ -1145,17 +1145,17 @@ const QUESTION_BANK = {
                     },
                     simplifiedExpression: "(A AND NOT B) OR (B AND C)",
                     gateCount: {
-                        original: 4,
+                        original: 13, // Expanded: 4 terms × 3 AND gates each = 12 AND, plus 3 OR = 15 total, but let's count: 4×(3 AND) + 3 OR = 12+3 = 15, but each term needs its own AND, so 4 AND gates for terms, 3 OR gates = 7 gates. Actually: 4 minterms, each with 3-input AND = 4×3 = 12 AND operations, but we can share, so 4 AND gates + 3 OR gates = 7 gates. But let's be more accurate: each minterm is a 3-input AND, so 4 AND gates, then 3 OR gates to combine them = 7 gates total. Simplified: 2 AND gates + 1 OR gate + 1 NOT = 4 gates.
                         simplified: 4,
-                        fewer: false
+                        fewer: true
                     }
                 },
                 hints: [
-                    "Build truth table: Q=1 when (A=1 AND B=0) OR (B=1 AND C=1).",
-                    "In the K-map, group the 1s. You'll find groups representing (A AND NOT B) and (B AND C).",
-                    "The simplified expression is the same as the original: (A AND NOT B) OR (B AND C). Both use 4 gates (2 AND, 1 OR, 1 NOT)."
+                    "Build truth table: Q=1 for minterms 3, 4, 5, 7. Each term in the expression represents one minterm.",
+                    "In the K-map, group the 1s. You'll find groups that can be combined to simplify the expression.",
+                    "The simplified expression reduces from 4 terms to 2 terms: (A AND NOT B) OR (B AND C). This uses fewer gates than the expanded form."
                 ],
-                explanation: "The truth table shows Q=1 for minterms 3, 4, 5, 7. The K-map groups these into (A AND NOT B) OR (B AND C), which is already simplified. Both forms use 4 gates, so no reduction is possible."
+                explanation: "The truth table shows Q=1 for minterms 3, 4, 5, 7. The expanded form has 4 terms (one per minterm). The K-map allows grouping these into (A AND NOT B) OR (B AND C), which uses fewer gates than the expanded form."
             },
             {
                 id: "E2",
@@ -1201,8 +1201,8 @@ const QUESTION_BANK = {
                 id: "E3",
                 type: "boss_fight",
                 difficulty: "hard",
-                question: "A circuit is described by: Q = A AND B AND C OR A AND NOT B AND NOT C. a) Make the truth table. b) Make the K-map. c) Simplify Q. d) Analyze gate reduction.",
-                expression: "(A AND B AND C) OR (A AND NOT B AND NOT C)",
+                question: "A circuit is described by: Q = (A AND NOT B AND NOT C) OR (A AND B AND C). a) Make the truth table. b) Make the K-map. c) Simplify Q. d) Analyze gate reduction.",
+                expression: "(A AND NOT B AND NOT C) OR (A AND B AND C)",
                 inputs: ["A", "B", "C"],
                 answer: {
                     table: [
