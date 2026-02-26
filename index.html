@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truth Table & K-Map Practice Game</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Truth Table & K-Map Practice Game</h1>
+            <div class="score-panel">
+                <div class="score-item">
+                    <span class="label">Score:</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="score-item">
+                    <span class="label">Progress:</span>
+                    <span id="progress">0/0</span>
+                </div>
+                <div class="score-item">
+                    <span class="label">Accuracy:</span>
+                    <span id="accuracy">0%</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="game-mode-selector" id="modeSelector">
+            <h2>Select Game Mode</h2>
+            <button class="mode-btn" data-mode="practice">Practice Mode</button>
+            <button class="mode-btn" data-mode="timed">Timed Mode</button>
+            <button class="mode-btn" data-mode="exam">Exam Mode</button>
+        </div>
+
+        <div class="game-area" id="gameArea" style="display: none;">
+            <div class="question-section">
+                <div class="question-header">
+                    <h2 id="questionTitle">Question</h2>
+                    <div class="question-meta">
+                        <span id="questionNumber">1</span> / <span id="totalQuestions">0</span>
+                        <span class="difficulty" id="difficulty"></span>
+                    </div>
+                </div>
+                <div class="question-content" id="questionContent"></div>
+                <div class="question-instructions" id="questionInstructions"></div>
+            </div>
+
+            <div class="answer-section" id="answerSection"></div>
+
+            <div class="controls">
+                <button id="hintBtn" class="btn btn-secondary">Get Hint</button>
+                <button id="checkBtn" class="btn btn-primary">Check Answer</button>
+                <button id="nextBtn" class="btn btn-primary" style="display: none;">Next Question</button>
+                <button id="showSolutionBtn" class="btn btn-secondary" style="display: none;">Show Solution</button>
+            </div>
+
+            <div class="hint-panel" id="hintPanel" style="display: none;">
+                <h3>Hint</h3>
+                <p id="hintText"></p>
+            </div>
+
+            <div class="feedback-panel" id="feedbackPanel" style="display: none;">
+                <h3 id="feedbackTitle"></h3>
+                <div id="feedbackContent"></div>
+            </div>
+
+            <div class="explanation-panel" id="explanationPanel" style="display: none;">
+                <h3>Step-by-Step Solution</h3>
+                <div id="explanationContent"></div>
+            </div>
+        </div>
+
+        <div class="question-selector" id="questionSelector" style="display: none;">
+            <h2>Select Question Category</h2>
+            <div class="category-list" id="categoryList"></div>
+        </div>
+    </div>
+
+    <script src="scripts/questions.js"></script>
+    <script src="scripts/scoring.js"></script>
+    <script src="scripts/truthTable.js"></script>
+    <script src="scripts/karnaughMap.js"></script>
+    <script src="scripts/game.js"></script>
+</body>
+</html>
+
