@@ -232,7 +232,7 @@ class LogicGame {
     }
 
     getInstructions(type) {
-        const instructions = {
+        let instructions = {
             truth_table: 'Fill in the output column (Q) with 0 or 1 for each row.',
             expression_and_table: 'Write the Boolean expression and fill in the truth table. Use operators: AND, OR, NOT, XOR.',
             kmap_from_table: 'Fill in the K-map cells based on the truth table. Click cells to toggle: 0 → 1 → X → 0. X means don\'t-care.',
@@ -242,7 +242,15 @@ class LogicGame {
             kmap_simplify: 'Fill in the K-map and write the simplified expression. Use operators: AND, OR, NOT.',
             boss_fight: 'Complete all parts: truth table, K-map, and simplification. Click K-map cells to toggle: 0 → 1 → X → 0.'
         };
-        return instructions[type] || 'Follow the instructions above.';
+        
+        let instruction = instructions[type] || 'Follow the instructions above.';
+        
+        // Add minterm explanation if this is a minterm question
+        if (type === 'kmap_from_minterms' && this.currentQuestion) {
+            instruction += ' <strong>What are minterms?</strong> Minterms are the row numbers in the truth table where Q=1. For 3 inputs, there are 8 rows (0-7). Minterm 0 = (A=0,B=0,C=0), minterm 1 = (A=0,B=0,C=1), minterm 2 = (A=0,B=1,C=0), etc. Place a 1 in the K-map cells corresponding to these minterms.';
+        }
+        
+        return instruction;
     }
 
     renderTruthTableQuestion(question) {

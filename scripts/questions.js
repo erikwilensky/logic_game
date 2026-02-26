@@ -889,7 +889,7 @@ const QUESTION_BANK = {
                 id: "D1",
                 type: "kmap_from_minterms",
                 difficulty: "hard",
-                question: "Given minterms: Q(A,B,C) = Σm(0,1,2,3,7). Draw K-map and simplify. (Expect one group of 4 and a leftover group.)",
+                question: "Given minterms: Q(A,B,C) = Σm(0,1,2,3,7). Draw K-map and simplify. (Expect one group of 4 and a leftover group.) Note: Minterms are the row numbers in the truth table where Q=1. For example, minterm 0 means the row where A=0, B=0, C=0; minterm 1 means A=0, B=0, C=1, etc.",
                 inputs: ["A", "B", "C"],
                 minterms: [0, 1, 2, 3, 7],
                 answer: {
@@ -918,7 +918,7 @@ const QUESTION_BANK = {
                 id: "D2",
                 type: "kmap_from_minterms",
                 difficulty: "hard",
-                question: "Given minterms: Q(A,B,C) = Σm(0,2,4,6). Draw K-map and simplify. (This one rewards spotting a pattern.)",
+                question: "Given minterms: Q(A,B,C) = Σm(0,2,4,6). Draw K-map and simplify. (This one rewards spotting a pattern.) Note: Minterms are truth table row numbers where Q=1. Minterm 0 = (A=0,B=0,C=0), minterm 2 = (A=0,B=1,C=0), minterm 4 = (A=1,B=0,C=0), minterm 6 = (A=1,B=1,C=0).",
                 inputs: ["A", "B", "C"],
                 minterms: [0, 2, 4, 6],
                 answer: {
@@ -1325,7 +1325,7 @@ const QUESTION_BANK = {
                 id: "ADD4",
                 type: "kmap_from_minterms",
                 difficulty: "hard",
-                question: "Given minterms: Q(A,B,C) = Σm(1,3,5,7). Draw K-map and simplify.",
+                question: "Given minterms: Q(A,B,C) = Σm(1,3,5,7). Draw K-map and simplify. Note: Minterms are truth table row numbers where Q=1. Σm(1,3,5,7) means Q=1 in rows 1, 3, 5, and 7 of the truth table.",
                 inputs: ["A", "B", "C"],
                 minterms: [1, 3, 5, 7],
                 answer: {
