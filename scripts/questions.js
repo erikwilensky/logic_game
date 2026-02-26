@@ -1161,8 +1161,8 @@ const QUESTION_BANK = {
                 id: "E2",
                 type: "boss_fight",
                 difficulty: "hard",
-                question: "A circuit is described by: Q = (A OR B) AND (NOT A OR C). a) Make the truth table. b) Make the K-map. c) Simplify Q. d) Compare gate counts.",
-                expression: "(A OR B) AND (NOT A OR C)",
+                question: "A circuit is described by: Q = (NOT A AND B AND NOT C) OR (NOT A AND B AND C) OR (A AND NOT B AND C) OR (A AND B AND C). a) Make the truth table. b) Make the K-map. c) Simplify Q. d) Compare gate counts.",
+                expression: "(NOT A AND B AND NOT C) OR (NOT A AND B AND C) OR (A AND NOT B AND C) OR (A AND B AND C)",
                 inputs: ["A", "B", "C"],
                 answer: {
                     table: [
