@@ -38,9 +38,31 @@ class KarnaughMapBuilder {
         const wrapper = document.createElement('div');
         wrapper.className = 'kmap-container';
 
+        // Create column header with labels
         const labels = document.createElement('div');
         labels.className = 'kmap-labels';
-        labels.innerHTML = `<div style="width: 60px;"></div><div class="kmap-col-labels"><div class="kmap-col-label">0</div><div class="kmap-col-label">1</div></div>`;
+        const spacer = document.createElement('div');
+        spacer.style.width = '60px';
+        spacer.style.minWidth = '60px';
+        labels.appendChild(spacer);
+        
+        const colLabelsDiv = document.createElement('div');
+        colLabelsDiv.className = 'kmap-col-labels';
+        colLabelsDiv.style.display = 'flex';
+        
+        // For 2-input: columns are just the second variable
+        const colLabels = ['0', '1'];
+        colLabels.forEach(label => {
+            const div = document.createElement('div');
+            div.className = 'kmap-col-label';
+            div.textContent = inputs[1] + '=' + label;
+            div.style.width = '60px';
+            div.style.minWidth = '60px';
+            div.style.textAlign = 'center';
+            colLabelsDiv.appendChild(div);
+        });
+        
+        labels.appendChild(colLabelsDiv);
         wrapper.appendChild(labels);
 
         // Initialize with proper structure - ensure all cells exist
@@ -114,18 +136,33 @@ class KarnaughMapBuilder {
         const wrapper = document.createElement('div');
         wrapper.className = 'kmap-container';
 
-        const colLabels = this.getGrayCodeOrder(2);
+        const colLabels = this.getGrayCodeOrder(2); // ['00', '01', '11', '10']
         const labels = document.createElement('div');
         labels.className = 'kmap-labels';
+        labels.style.display = 'flex';
+        
+        // Spacer for row labels
+        const spacer = document.createElement('div');
+        spacer.style.width = '60px';
+        spacer.style.minWidth = '60px';
+        labels.appendChild(spacer);
+        
+        // Column labels with variable names
         const colLabelsDiv = document.createElement('div');
         colLabelsDiv.className = 'kmap-col-labels';
+        colLabelsDiv.style.display = 'flex';
+        
         colLabels.forEach(label => {
             const div = document.createElement('div');
             div.className = 'kmap-col-label';
-            div.textContent = label;
+            // Format: BC=00, BC=01, etc.
+            div.textContent = inputs[1] + inputs[2] + '=' + label;
+            div.style.width = '60px';
+            div.style.minWidth = '60px';
+            div.style.textAlign = 'center';
             colLabelsDiv.appendChild(div);
         });
-        labels.innerHTML = `<div style="width: 60px;"></div>`;
+        
         labels.appendChild(colLabelsDiv);
         wrapper.appendChild(labels);
 

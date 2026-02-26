@@ -372,6 +372,7 @@ header h1 {
 
 .kmap-row {
     display: flex;
+    align-items: stretch;
 }
 
 .kmap-cell {
@@ -429,27 +430,35 @@ header h1 {
     margin-bottom: 10px;
     font-weight: 600;
     color: var(--text-color);
+    align-items: center;
 }
 
 .kmap-row-label {
     width: 60px;
+    min-width: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
     color: var(--text-color);
+    flex-shrink: 0;
 }
 
 .kmap-col-labels {
     display: flex;
-    margin-left: 60px;
+    flex: 1;
 }
 
 .kmap-col-label {
     width: 60px;
+    min-width: 60px;
     text-align: center;
     font-weight: 600;
     color: var(--text-color);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .kmap-grouping-controls {
