@@ -527,6 +527,10 @@ class LogicGame {
         // Don't reveal the answer in the explanation
         explanationText = explanationText.replace(/The simplified expression is [^.]*\./gi, '');
         explanationText = explanationText.replace(/This simplifies to [^.]*\./gi, '');
+        explanationText = explanationText.replace(/is [A-Z0-9\s\(\)ANDORNOTXOR]+\./gi, '');
+        explanationText = explanationText.replace(/expression [A-Z0-9\s\(\)ANDORNOTXOR]+/gi, 'expression');
+        explanationText = explanationText.replace(/represents [A-Z0-9\s\(\)ANDORNOTXOR]+/gi, 'represents a simplified form');
+        explanationText = explanationText.replace(/This represents [A-Z0-9\s\(\)ANDORNOTXOR]+/gi, 'This represents a simplified form');
         
         this.elements.explanationContent.innerHTML = `<p>${explanationText}</p>`;
     }

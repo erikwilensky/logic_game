@@ -631,9 +631,9 @@ const QUESTION_BANK = {
                 hints: [
                     "First build the truth table. Q=1 when (A OR B)=1 AND C=0.",
                     "In the K-map, place values with A on rows (0,1) and BC on columns in Gray order (00,01,11,10).",
-                    "Group the 1s: There are three 1s in the A=1 row when C=0. This represents (A OR B) AND NOT C."
+                    "Group the 1s: Look for patterns where C=0. Try grouping cells that share common variables."
                 ],
-                explanation: "The K-map shows 1s when A=1 or B=1, but only when C=0. The simplified expression is (A OR B) AND NOT C."
+                explanation: "The K-map shows 1s when A=1 or B=1, but only when C=0. Look for groups that cover these 1s and identify which variables remain constant in each group."
             },
             {
                 id: "C2",
