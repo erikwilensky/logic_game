@@ -313,22 +313,32 @@ class KarnaughMapBuilder {
 
     populateFromTruthTable(truthTable, numInputs) {
         if (numInputs === 2) {
-            this.kmapData[0][0] = truthTable[0][2];
-            this.kmapData[0][1] = truthTable[1][2];
-            this.kmapData[1][0] = truthTable[2][2];
-            this.kmapData[1][1] = truthTable[3][2];
+            // Truth table order: 00, 01, 10, 11
+            // K-map: row A, col B
+            this.kmapData[0][0] = truthTable[0][2]; // A=0, B=0
+            this.kmapData[0][1] = truthTable[1][2]; // A=0, B=1
+            this.kmapData[1][0] = truthTable[2][2]; // A=1, B=0
+            this.kmapData[1][1] = truthTable[3][2]; // A=1, B=1
         } else if (numInputs === 3) {
-            const mapping = [
-                [0, 0, 0], [0, 0, 1], [0, 1, 1], [0, 1, 0],
-                [1, 1, 0], [1, 1, 1], [1, 0, 1], [1, 0, 0]
+            // Truth table is in standard binary order: ABC = 000, 001, 010, 011, 100, 101, 110, 111
+            // K-map columns are in Gray code: BC = 00, 01, 11, 10
+            // Map each truth table row to correct K-map position
+            const truthTableToKmap = [
+                { ttRow: 0, kmapRow: 0, kmapCol: 0 }, // A=0, B=0, C=0 → A=0, BC=00
+                { ttRow: 1, kmapRow: 0, kmapCol: 1 }, // A=0, B=0, C=1 → A=0, BC=01
+                { ttRow: 2, kmapRow: 0, kmapCol: 3 }, // A=0, B=1, C=0 → A=0, BC=10
+                { ttRow: 3, kmapRow: 0, kmapCol: 2 }, // A=0, B=1, C=1 → A=0, BC=11
+                { ttRow: 4, kmapRow: 1, kmapCol: 0 }, // A=1, B=0, C=0 → A=1, BC=00
+                { ttRow: 5, kmapRow: 1, kmapCol: 1 }, // A=1, B=0, C=1 → A=1, BC=01
+                { ttRow: 6, kmapRow: 1, kmapCol: 3 }, // A=1, B=1, C=0 → A=1, BC=10
+                { ttRow: 7, kmapRow: 1, kmapCol: 2 }  // A=1, B=1, C=1 → A=1, BC=11
             ];
-            mapping.forEach((bits, idx) => {
-                const row = bits[0];
-                const bc = bits.slice(1).join('');
-                const colMap = { '00': 0, '01': 1, '11': 2, '10': 3 };
-                const col = colMap[bc];
-                const output = truthTable[idx][3];
-                this.kmapData[row][col] = output;
+            
+            truthTableToKmap.forEach(mapping => {
+                if (truthTable[mapping.ttRow] && truthTable[mapping.ttRow].length > 3) {
+                    const output = truthTable[mapping.ttRow][3];
+                    this.kmapData[mapping.kmapRow][mapping.kmapCol] = output;
+                }
             });
         }
     }
@@ -410,7 +420,14 @@ class KarnaughMapBuilder {
                 }
                 
                 if (exp !== act) {
-                    return { isCorrect: false, message: `Mismatch at row ${i}, col ${j}. Expected ${exp}, got ${act}` };
+                    // Provide more helpful error message
+                    const rowLabel = i === 0 ? 'A=0' : 'A=1';
+                    const colLabels = ['00', '01', '11', '10'];
+                    const colLabel = colLabels[j] || `col ${j}`;
+                    return { 
+                        isCorrect: false, 
+                        message: `K-map cell at ${rowLabel}, BC=${colLabel} is incorrect. Expected ${exp}, but you have ${act}.` 
+                    };
                 }
             }
         }

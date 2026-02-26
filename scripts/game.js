@@ -511,16 +511,24 @@ class LogicGame {
             this.elements.showSolutionBtn.style.display = 'inline-block';
         }
 
-        if (this.currentQuestion.explanation) {
-            setTimeout(() => {
-                this.showExplanation();
-            }, 1000);
-        }
+        // Don't auto-show explanation - user can check solution if needed
+        // if (this.currentQuestion.explanation) {
+        //     setTimeout(() => {
+        //         this.showExplanation();
+        //     }, 1000);
+        // }
     }
 
     showExplanation() {
         this.elements.explanationPanel.style.display = 'block';
-        this.elements.explanationContent.innerHTML = `<p>${this.currentQuestion.explanation}</p>`;
+        let explanationText = this.currentQuestion.explanation || '';
+        
+        // Remove any expression from explanation if it contains one
+        // Don't reveal the answer in the explanation
+        explanationText = explanationText.replace(/The simplified expression is [^.]*\./gi, '');
+        explanationText = explanationText.replace(/This simplifies to [^.]*\./gi, '');
+        
+        this.elements.explanationContent.innerHTML = `<p>${explanationText}</p>`;
     }
 
     showSolution() {
@@ -528,11 +536,17 @@ class LogicGame {
             this.truthTableBuilder.showAnswer();
         }
         if (this.kmapBuilder && this.currentQuestion.answer?.kmap) {
-            this.kmapBuilder.setKmapData(this.currentQuestion.answer.kmap.values);
+            const kmap = this.currentQuestion.answer.kmap;
+            if (kmap.values) {
+                this.kmapBuilder.setKmapData(kmap.values);
+            } else if (Array.isArray(kmap)) {
+                this.kmapBuilder.setKmapData(kmap);
+            }
         }
         const expressionInput = document.getElementById('kmapExpressionInput');
-        if (expressionInput && this.currentQuestion.answer?.expression) {
-            expressionInput.value = this.currentQuestion.answer.expression;
+        if (expressionInput) {
+            // Don't auto-fill the expression - user should figure it out themselves
+            // The "Show Solution" button will reveal it if they need help
         }
         const exprInput = document.getElementById('expressionInput');
         if (exprInput && this.currentQuestion.expectedExpression) {
