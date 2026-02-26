@@ -43,14 +43,43 @@ class KarnaughMapBuilder {
         labels.innerHTML = `<div style="width: 60px;"></div><div class="kmap-col-labels"><div class="kmap-col-label">0</div><div class="kmap-col-label">1</div></div>`;
         wrapper.appendChild(labels);
 
-        this.kmapData = [[null, null], [null, null]];
+        // Initialize with proper structure - ensure all cells exist
+        this.kmapData = [[0, 0], [0, 0]];
 
         if (question.answer && question.answer.kmap) {
-            this.kmapData = question.answer.kmap.map(row => [...row]);
+            const kmap = question.answer.kmap;
+            if (Array.isArray(kmap) && Array.isArray(kmap[0])) {
+                // Ensure we have the right structure
+                this.kmapData = kmap.map(row => {
+                    const newRow = [0, 0];
+                    if (Array.isArray(row)) {
+                        for (let i = 0; i < Math.min(row.length, 2); i++) {
+                            newRow[i] = row[i] !== null && row[i] !== undefined ? row[i] : 0;
+                        }
+                    }
+                    return newRow;
+                });
+            }
         } else if (question.truthTable) {
             this.populateFromTruthTable(question.truthTable, 2);
         } else if (question.minterms) {
             this.populateFromMinterms(question.minterms, 2);
+        }
+        
+        // Ensure we always have 2 rows and 2 columns
+        if (this.kmapData.length < 2) {
+            this.kmapData.push([0, 0]);
+        }
+        for (let i = 0; i < this.kmapData.length; i++) {
+            if (!Array.isArray(this.kmapData[i]) || this.kmapData[i].length < 2) {
+                const newRow = [0, 0];
+                if (Array.isArray(this.kmapData[i])) {
+                    for (let j = 0; j < Math.min(this.kmapData[i].length, 2); j++) {
+                        newRow[j] = this.kmapData[i][j] !== null && this.kmapData[i][j] !== undefined ? this.kmapData[i][j] : 0;
+                    }
+                }
+                this.kmapData[i] = newRow;
+            }
         }
 
         const rowLabels = ['0', '1'];
@@ -64,6 +93,13 @@ class KarnaughMapBuilder {
             rowDiv.appendChild(label);
 
             [0, 1].forEach((colIdx) => {
+                // Ensure data exists before accessing
+                if (!this.kmapData[rowIdx]) {
+                    this.kmapData[rowIdx] = [0, 0];
+                }
+                if (this.kmapData[rowIdx][colIdx] === null || this.kmapData[rowIdx][colIdx] === undefined) {
+                    this.kmapData[rowIdx][colIdx] = 0;
+                }
                 const cell = this.createCell(rowIdx, colIdx, this.kmapData[rowIdx][colIdx]);
                 rowDiv.appendChild(cell);
             });
@@ -93,20 +129,55 @@ class KarnaughMapBuilder {
         labels.appendChild(colLabelsDiv);
         wrapper.appendChild(labels);
 
+        // Initialize with proper structure - ensure all cells exist
         this.kmapData = [
-            [null, null, null, null],
-            [null, null, null, null]
+            [0, 0, 0, 0],
+            [0, 0, 0, 0]
         ];
 
         if (question.answer && question.answer.kmap) {
             const kmap = question.answer.kmap;
             if (kmap.values) {
-                this.kmapData = kmap.values.map(row => [...row]);
+                // Ensure we have the right structure
+                this.kmapData = kmap.values.map(row => {
+                    const newRow = [0, 0, 0, 0];
+                    for (let i = 0; i < Math.min(row.length, 4); i++) {
+                        newRow[i] = row[i] !== null && row[i] !== undefined ? row[i] : 0;
+                    }
+                    return newRow;
+                });
+            } else if (Array.isArray(kmap)) {
+                // Handle 2D array format directly
+                this.kmapData = kmap.map(row => {
+                    const newRow = [0, 0, 0, 0];
+                    if (Array.isArray(row)) {
+                        for (let i = 0; i < Math.min(row.length, 4); i++) {
+                            newRow[i] = row[i] !== null && row[i] !== undefined ? row[i] : 0;
+                        }
+                    }
+                    return newRow;
+                });
             }
         } else if (question.truthTable) {
             this.populateFromTruthTable(question.truthTable, 3);
         } else if (question.minterms) {
             this.populateFromMinterms(question.minterms, 3);
+        }
+        
+        // Ensure we always have 2 rows and 4 columns
+        if (this.kmapData.length < 2) {
+            this.kmapData.push([0, 0, 0, 0]);
+        }
+        for (let i = 0; i < this.kmapData.length; i++) {
+            if (!Array.isArray(this.kmapData[i]) || this.kmapData[i].length < 4) {
+                const newRow = [0, 0, 0, 0];
+                if (Array.isArray(this.kmapData[i])) {
+                    for (let j = 0; j < Math.min(this.kmapData[i].length, 4); j++) {
+                        newRow[j] = this.kmapData[i][j] !== null && this.kmapData[i][j] !== undefined ? this.kmapData[i][j] : 0;
+                    }
+                }
+                this.kmapData[i] = newRow;
+            }
         }
 
         const rowLabels = ['0', '1'];
@@ -120,7 +191,15 @@ class KarnaughMapBuilder {
             rowDiv.appendChild(label);
 
             colLabels.forEach((colLabel, colIdx) => {
-                const cell = this.createCell(parseInt(rowIdx), colIdx, this.kmapData[parseInt(rowIdx)][colIdx]);
+                const rowNum = parseInt(rowIdx);
+                // Ensure data exists before accessing
+                if (!this.kmapData[rowNum]) {
+                    this.kmapData[rowNum] = [0, 0, 0, 0];
+                }
+                if (this.kmapData[rowNum][colIdx] === null || this.kmapData[rowNum][colIdx] === undefined) {
+                    this.kmapData[rowNum][colIdx] = 0;
+                }
+                const cell = this.createCell(rowNum, colIdx, this.kmapData[rowNum][colIdx]);
                 rowDiv.appendChild(cell);
             });
 
@@ -136,8 +215,19 @@ class KarnaughMapBuilder {
         cell.dataset.row = row;
         cell.dataset.col = col;
 
+        // Ensure we have a valid value
         let value = initialValue;
-        if (value === null || value === undefined) value = 0;
+        if (value === null || value === undefined || value === '') {
+            value = 0;
+        }
+        
+        // Ensure the kmapData array has this cell
+        if (!this.kmapData[row]) {
+            this.kmapData[row] = [];
+        }
+        if (this.kmapData[row][col] === null || this.kmapData[row][col] === undefined) {
+            this.kmapData[row][col] = value;
+        }
 
         this.updateCellAppearance(cell, value);
         cell.textContent = value === 'X' || value === 'x' ? 'X' : value;
