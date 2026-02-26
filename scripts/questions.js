@@ -1246,7 +1246,7 @@ const QUESTION_BANK = {
                 id: "ADD1",
                 type: "truth_table",
                 difficulty: "easy",
-                question: "Construct a truth table for Q = A NAND B.",
+                question: "Construct a truth table for Q = A NAND B. (Note: NAND means NOT AND, so Q = NOT (A AND B))",
                 expression: "NOT (A AND B)",
                 inputs: ["A", "B"],
                 answer: {
